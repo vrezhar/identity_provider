@@ -1,0 +1,54 @@
+plugins {
+	id 'org.springframework.boot' version '2.4.2'
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+}
+
+group = 'am.ysu.identity'
+version = '1.0.0'
+sourceCompatibility = '17'
+
+springBoot {
+	mainClass.set("am.ysu.identity.IdentityProviderServer")
+}
+
+compileJava {
+	inputs.files(processResources)
+}
+repositories {
+	mavenLocal()
+	mavenCentral()
+}
+
+bootRun {
+	// support passing -Dsystem.property=value to bootRun task
+	systemProperties = System.properties
+}
+
+dependencies {
+	compileOnly 'org.projectlombok:lombok:1.18.22'
+	annotationProcessor 'org.projectlombok:lombok:1.18.22'
+	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'am.ysu.security:ysu-starter-security:2.0'
+	runtimeClasspath 'mysql:mysql-connector-java:8.0.25'
+
+	testImplementation('org.junit.jupiter:junit-jupiter')
+	testImplementation('org.springframework.boot:spring-boot-starter-test:2.5.3'){
+		exclude(group: "junit")
+	}
+	testRuntimeClasspath 'com.h2database:h2'
+	testImplementation 'org.springframework.security:spring-security-test'
+}
+
+compileJava {
+	inputs.files(processResources)
+}
+
+test {
+	useJUnitPlatform()
+}

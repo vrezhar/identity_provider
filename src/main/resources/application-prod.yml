@@ -1,0 +1,16 @@
+server:
+  servlet:
+    context-path: "/"
+
+---
+security:
+  oauth:
+    tokens:
+      issuer: id-server
+      audience: *
+      expiration:
+        user:
+          access: 30
+          id: 5
+        service:
+          access: 15

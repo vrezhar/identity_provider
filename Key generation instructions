@@ -1,0 +1,4 @@
+Generate RSA keys in format understandable for java(PEM)
+openssl genrsa -out private_der.key 4096
+openssl rsa -pubout -in private_der.key -out public.key
+openssl pkcs8 -topk8 -in private_der.key -inform pem -out private.key -outform pem -nocrypt

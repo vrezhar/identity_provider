@@ -1,0 +1,664 @@
+openapi: 3.0.3
+info:
+  title: Estateguru user Identification/Authentication server
+  version: 0.0.1
+paths:
+  /login:
+    post:
+      summary: Perform authentication with user credentials
+      description: Authenticate the user and give an id token in exchange
+      tags:
+        - Token endpoints
+      security:
+        - serviceAccessToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCredentialsEntity'
+      parameters:
+        - required: false
+          schema:
+            title: Nonce
+            type: string
+          name: nonce
+          in: query
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEntity'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEntity'
+
+  /sign:
+    post:
+      summary: Sign data with server's public key
+      description: Sign given JSON(no restrictions) with server's private key
+      tags:
+        - Token endpoints
+      security:
+        - serviceAccessToken: []
+      requestBody:
+        content:
+          application/json:
+            example: {test: "test"}
+            schema:
+              type: object
+        required: true
+      parameters:
+        - required: false
+          schema:
+            description: Whether to format the response into a JWT or not
+            title: Produce JWT
+            type: boolean
+          name: produce_jwt
+          in: query
+        - required: false
+          schema:
+            description: The audience of the token, should be present if produce_jwt=true
+            title: Audience
+            type: string
+          name: audience
+          in: query
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignatureResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEntity'
+
+  /token/service:
+    post:
+      security:
+        - basicClientAuthentication: []
+      tags:
+        - Token endpoints
+      summary: Obtain a token for service-to-service communication
+      description: Obtain a short-lived access token for service-to-service communication
+      operationId: getServiceAccessToken
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEntity'
+        '401':
+          description: Authorization required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEntity'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEntity'
+
+  /token/user:
+    post:
+      security:
+        - idToken: [ ]
+      tags:
+        - Token endpoints
+      summary: Endpoint for obtaining access tokens for a user
+      description: Endpoint for obtaining access tokens in exchange for id tokens
+      operationId: getUserAccessToken
+      parameters:
+        - required: true
+          schema:
+            title: Account Id
+            type: string
+          name: account_id
+          in: query
+        - required: false
+          schema:
+            title: Nonce
+            type: string
+          name: nonce
+          in: query
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEntity'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEntity'
+
+  /token/refresh:
+    post:
+      security:
+        - serviceAccessToken: [ ]
+      tags:
+        - Token endpoints
+      summary: Endpoint for refreshing user access token with a refresh token
+      description: Exchange an expired access token for a new one using the refresh token
+      operationId: refreshAccessToken
+      parameters:
+        - in: query
+          schema:
+            description: The refresh token id
+            title: Refresh Token Id
+            type: string
+          name: refresh_token
+          required: true
+        - in: query
+          schema:
+            description: A new accound id
+            title: Account ID
+            type: string
+          name: account_id
+          required: false
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEntity'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEntity'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+
+  /token/check:
+    post:
+      security:
+        - serviceAccessToken: [ ]
+      tags:
+        - Token endpoints
+      summary: Endpoint for checking whether access token is valid or not
+      description: Check whether an access token is valid or not
+      operationId: checkAccessToken
+      parameters:
+        - required: true
+          schema:
+            description: The access token id to check
+            title: Access Token Id
+            type: string
+          name: access_token
+          in: query
+      responses:
+        '200':
+          description: Successful Response
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEntity'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEntity'
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+
+  /token/revoke:
+    post:
+      security:
+        - serviceAccessToken: [ ]
+      tags:
+        - Token endpoints
+      summary: Endpoint for rrevoking an access token
+      description: Revvoke an access token by it's id
+      operationId: revokeAccessToken
+      parameters:
+        - required: true
+          schema:
+            description: The access token id to check
+            title: Access Token Id
+            type: string
+          name: access_token
+          in: query
+      responses:
+        '200':
+          description: Successful Response
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEntity'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEntity'
+
+  /user:
+    post:
+      security:
+        - serviceAccessToken: []
+      tags:
+        - User operations
+      description: Register a new user in the AS database
+      summary: Add a new user
+      operationId: regsiterUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCredentialsEntity'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEntity'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEntity'
+    put:
+      security:
+        - serviceAccessToken: []
+      tags:
+        - User operations
+      summary: Update the user's username or/and password
+      description: Updates the user's credentials provided that current credentials are present and valid
+      operationId: updateUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateEntity'
+      responses:
+        '200':
+          description: Successful Response
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEntity'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEntity'
+    delete:
+      security:
+        - serviceAccessToken: []
+      tags:
+        - User operations
+      description: Delete a user with given username
+      summary: Delete a user
+      operationId: deleteUser
+      parameters:
+        - in: query
+          schema:
+            title: Username
+            type: string
+          name: username
+          required: true
+          description: The username
+      responses:
+        '200':
+          description: Successful Response
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEntity'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEntity'
+
+  /user/password/forgot:
+    post:
+      security:
+        - serviceAccessToken: [ ]
+      tags:
+        - User operations
+      description: Start user password change process
+      summary: Generate a unique key that will be put in the password recovery email
+      operationId: forgotPassword
+      parameters:
+        - in: query
+          schema:
+            title: Username
+            type: string
+          name: username
+          required: true
+          description: The username
+      responses:
+        '200':
+          description: Successful Response
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEntity'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEntity'
+
+  /user/password/recover:
+    post:
+      security:
+        - serviceAccessToken: [ ]
+      tags:
+        - User operations
+      description: Change the user's password with provided new one if the password change key is valid
+      summary: Generate a unique key
+      operationId: recoverPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCredentialsEntity'
+      parameters:
+        - in: query
+          schema:
+            title: Password change key
+            type: string
+          name: password_recovery_key
+          required: true
+          description: The unique key generated when user submitted the password change request
+      responses:
+        '200':
+          description: Successful Response
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEntity'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEntity'
+
+  /user/check:
+    post:
+      security:
+        - serviceAccessToken: []
+      tags:
+        - User operations
+      description: Validates user credentials
+      summary: Check a user
+      operationId: checkUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCredentialsEntity'
+      responses:
+        200:
+          description: Credentials are valid
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEntity'
+  /key:
+    get:
+      security:
+        - serviceAccessToken: []
+      tags:
+        - Key retrieval
+      description: Fetch server's or a user's public key, returns user's public key if a username is specified
+      summary: Get a public key for signature verification
+      parameters:
+        - in: query
+          description: Username of the user whose key is being requested
+          schema:
+            type: string
+            title: Username
+          name: username
+          required: false
+      responses:
+        200:
+          description: Successful request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KeyResponse'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorEntity'
+
+components:
+  securitySchemes:
+    basicClientAuthentication:
+      scheme: basic
+      type: http
+      description: Basic Http Authentication using client credentials
+    serviceAccessToken:
+      type: apiKey
+      in: header
+      name: Authorization
+      #openIdConnectUrl: mightadd.later.com
+      description: An access token used by services for secure communication
+    idToken:
+      type: apiKey
+      in: header
+      name: Authorization
+      #openIdConnectUrl: mightadd.later.com
+      description: An id token given to a user after successful authentication
+    accessToken:
+      type: apiKey
+      in: header
+      name: Authorization
+      #openIdConnectUrl: mightadd.later.com
+      description: An access token given to a user in exchange for an id token issued earlier
+
+  schemas:
+    TokenResponse:
+      title: TokenResponse
+      required:
+        - status
+        - token
+      type: object
+      properties:
+        status:
+          title: Status
+          type: string
+          description: Response's Http status
+          default: 200
+        token:
+          title: Token
+          type: string
+          description: The generated JWT
+
+    KeyResponse:
+      title: KeyResponse
+      required:
+        - status
+        - key
+      type: object
+      properties:
+        status:
+          title: Status
+          type: string
+          description: Response's Http status
+          default: 200
+        key:
+          title: Token
+          type: string
+          description: The User's or server's public key
+
+    SignatureResponse:
+      title: SignatureResponse
+      required:
+        - status
+        - signature
+      type: object
+      properties:
+        status:
+          title: Status
+          type: string
+          description: Response's Http status
+          default: 200
+        key:
+          title: Signature
+          type: string
+          description: Requested signature in Base64
+
+    UserCredentialsEntity:
+      title: User credentials
+      required:
+        - username
+        - password
+      type: object
+      properties:
+        username:
+          title: Username
+          type: string
+          description: The username of the user - email, phone etc.
+        password:
+          title: Password
+          type: string
+          description: The user's password as a plain text
+
+    UserUpdateEntity:
+      title: User update entity
+      required:
+        - username
+        - password
+      type: object
+      properties:
+        username:
+          title: Username
+          type: string
+          description: The username of the user - email, phone etc.
+        password:
+          title: Password
+          type: string
+          description: The user's password as a plain text, not hashed or encrypted
+        new_password:
+          title: New password
+          type: string
+          description: New password
+        new_username:
+          title: New username
+          type: string
+          description: New username
+
+    ErrorEntity:
+      title: Error entity
+      required:
+        - status
+        - error
+      type: object
+      properties:
+        status:
+          title: Status
+          description: Http status of the error
+          type: integer
+        error:
+          title: Error message
+          description: Human-readable error description
+          type: string
+
+    NotFound:
+      title: Bad request entity
+      required:
+        - status
+        - error
+        - id
+      type: object
+      properties:
+        status:
+          title: Status
+          description: Http status of the error
+          type: integer
+          default: 400
+        error:
+          title: Error message
+          description: Human-readable error description
+          type: string
+        id:
+          title: Error message
+          type: string
+          description: The id of the entity that was not found
