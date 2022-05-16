@@ -65,4 +65,14 @@ public class ServerSigningKey implements KeyPairHolder, Serializable {
     public KeyType getKeyType() {
         return keyType;
     }
+
+    @Override
+    public void encryptPrivateKey(String secret) {
+
+    }
+
+    @Override
+    public String decryptPrivateKey(String secret) {
+        return privateKey;
+    }
 }

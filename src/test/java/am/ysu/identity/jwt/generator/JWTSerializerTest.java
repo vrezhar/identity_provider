@@ -24,7 +24,7 @@ public class JWTSerializerTest
             jwt.setKeyPair(TestingKeyHolder.getTestingKeyPair());
             jwt.setExpirationDate(1916239058);
             jwt.setIssuedAt(new Date());
-            jwt.setIssuer("id.estateguru.co");
+            jwt.setIssuer("identity.provider.example.am");
             final String encodedJWT = JWTSerializer.encodeAndSerializeAsString(jwt);
             assertEquals(encodedJWT.split("\\.").length, 3);
         }
@@ -42,13 +42,13 @@ public class JWTSerializerTest
             jwt.setKeyPair(TestingKeyHolder.getTestingKeyPair());
             jwt.setExpirationDate(1916239058);
             jwt.setIssuedAt(new Date());
-            jwt.setIssuer("id.estateguru.co");
-            jwt.setUserId("+37491018211");
+            jwt.setIssuer("identity.provider.example.am");
+            jwt.setUserId("+374910000000");
             jwt.setAudience(Arrays.asList("example.com", "example1.com"));
             final String encodedJWT = JWTSerializer.encodeAndSerializeAsString(jwt);
             JWT parsedBackJWT = new JWT(encodedJWT);
-            assertEquals("+37491018211", parsedBackJWT.getClaim("sub"), "Mismatching user id, should be +37491018211");
-            assertEquals("id.estateguru.co", parsedBackJWT.getClaim("iss"), "Mismatching issuer, should be id.estateguru.co");
+            assertEquals("+374910000000", parsedBackJWT.getClaim("sub"), "Mismatching user id, should be +374910000000");
+            assertEquals("identity.provider.example.am", parsedBackJWT.getClaim("iss"), "Mismatching issuer, should be identity.provider.example.am");
         }
         catch (Exception any){
             fail(any.getMessage());

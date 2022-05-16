@@ -7,6 +7,7 @@ import am.ysu.identity.domain.Client;
 import am.ysu.identity.security.auth.client.ClientAuthentication;
 import am.ysu.identity.service.ClientService;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -30,11 +31,27 @@ public class ClientCredentialsProcessorFilter extends CredentialAwareFilter {
     }
 
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        final Client client = clientService.checkClient(request).orElseThrow(() -> new ClientAuthorizationException("invalid.credentials"));
-        /*
-         * Create a custom authentication object and initialize the context with it
-         */
-        SecurityContextHolder.getContext().setAuthentication(createClientAuthentication(client));
+        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if(authHeader.startsWith("Basic")) {
+            final var credentials = clientService.getClientCredentials(request);
+            final var optionalClient = clientService.findById(credentials.getClientId());
+            if(optionalClient.isPresent()) {
+                final var client = optionalClient.get();
+                if(client.getIsSecretEncrypted()) {
+                    //secret encrypted, this should be a standard basic auth
+                    /*
+                     * Create a custom authentication object and initialize the context with it
+                     */
+                    if(clientService.checkSecret(client, credentials.getClientSecret())) {
+                        SecurityContextHolder.getContext().setAuthentication(createClientAuthentication(client));
+                        chain.doFilter(request, response);
+                        return;
+                    }
+                    chain.doFilter(request, response);
+                    return;
+                }
+            }
+        }
         chain.doFilter(request, response);
     }
 

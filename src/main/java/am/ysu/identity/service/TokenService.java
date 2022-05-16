@@ -218,17 +218,6 @@ public class TokenService {
         });
     }
 
-//    public EstateJWTToken serialize(AccessToken accessToken)
-//    {
-//
-//    }
-//
-//    public JWTIDToken createIdToken(User user)
-//    {
-//        JWTIDToken idToken = new JWTIDToken();
-//        idToken.setIssuedAt();
-//    }
-
     /**
      * Synced method for finding user's access token
      * @param user The user in question

@@ -14,6 +14,10 @@ public interface KeyPairHolder {
 
     KeyType getKeyType();
 
+    void encryptPrivateKey(String secret);
+
+    String decryptPrivateKey(String secret);
+
     default PublicKey decodePublicKey() {
         final KeyType keyType = getKeyType();
         switch (keyType) {
@@ -66,6 +70,26 @@ public interface KeyPairHolder {
             case EC:
                 try {
                     return new KeyPair(KeyUtils.getEcPublicKey(getPublicKey()), KeyUtils.getEcPrivateKey(getPrivateKey()));
+                } catch(InvalidKeySpecException e) {
+                    throw new RuntimeException("Corrupt key pair in the database", e);
+                }
+            default:
+                throw new IllegalArgumentException("Unsupported key type [" + keyType + "]");
+        }
+    }
+
+    default KeyPair asKeypair(String secret) {
+        final KeyType keyType = getKeyType();
+        switch (keyType) {
+            case RSA:
+                try {
+                    return new KeyPair(KeyUtils.getRsaPublicKey(getPublicKey()), KeyUtils.getRsaPrivateKey(decryptPrivateKey(secret)));
+                } catch(InvalidKeySpecException e) {
+                    throw new RuntimeException("Corrupt key pair in the database", e);
+                }
+            case EC:
+                try {
+                    return new KeyPair(KeyUtils.getEcPublicKey(getPublicKey()), KeyUtils.getEcPrivateKey(decryptPrivateKey(secret)));
                 } catch(InvalidKeySpecException e) {
                     throw new RuntimeException("Corrupt key pair in the database", e);
                 }

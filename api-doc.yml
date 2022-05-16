@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Estateguru user Identification/Authentication server
+  title: Identity provider server
   version: 0.0.1
 paths:
   /login:

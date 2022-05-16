@@ -49,7 +49,7 @@ public class TokenValidatorService {
         this.serviceAccessTokenDao = serviceAccessTokenDao;
         this.clientService = clientService;
         this.keyService = keyService;
-        this.issuer = environment.getProperty("security.oauth.tokens.issuer", String.class,"id.staging.estateguru.co");
+        this.issuer = environment.getProperty("security.oauth.tokens.issuer");
     }
 
     @Transactional(noRollbackFor = ForbiddenActionException.class)

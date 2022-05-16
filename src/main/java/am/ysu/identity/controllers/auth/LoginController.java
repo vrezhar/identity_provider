@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -45,21 +46,11 @@ public class LoginController {
         this.rememberMeService = rememberMeService;
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseEntity<?> login(@RequestBody UserCredentialsDto userCredentialsDto,
-                                        @RequestParam(value = "redirect_uri", required = false) @Nullable String redirectUrl,
-                                        @RequestParam("client_id") String clientId,
-                                        @RequestParam(value = "default_account", required = false) String defaultAccountId,
-                                        HttpServletResponse response) throws IOException
-    {
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody UserCredentialsDto userCredentialsDto, HttpServletResponse response) {
         final User user = userService.checkCredentials(userCredentialsDto.getUsername(), userCredentialsDto.getPassword())
                 .orElseThrow(() -> new UserAuthorizationException("invalid.credentials", Realms.USER_OPERATIONS_REALM));
-        final String jwt = JWTSerializer.encodeAndSerializeAsString(jwtTokenService.generateIdToken(user, clientId, defaultAccountId != null ? defaultAccountId : user.getDefaultAccountId()));
-        if(redirectUrl != null){
-            response.addHeader("Authorization", "Bearer " + jwt);
-            response.sendRedirect(redirectUrl);
-            return ResponseEntity.status(HttpStatus.OK).build();
-        }
+        final String jwt = JWTSerializer.encodeAndSerializeAsString(jwtTokenService.generateIdToken(user, "*"));
         if(userCredentialsDto.isRememberMe()) {
             rememberMeService.rememberMe(user, response);
         }
@@ -68,21 +59,24 @@ public class LoginController {
 
     @PostMapping("/login/vouch")
     @PreAuthorize("principal instanceof T(am.ysu.identity.domain.Client)")
-    public TokenResponseDto vouch(@Valid @RequestBody UserInitialsDto userInitialsDto) {
+    public TokenResponseDto vouch(
+            @AuthenticationPrincipal Client client,
+            @Valid @RequestBody UserInitialsDto userInitialsDto
+    ) {
         final User user = userService.findByUsername(userInitialsDto.username).orElseThrow(() -> {
             logger.info("User {} not found", userInitialsDto.username);
             return new NoSuchElementException("not.found");
         } );
-        final Client client = (Client)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        final Client client = (Client)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         userService.changeInitials(user, userInitialsDto);
-        final var jwt = JWTSerializer.encodeAndSerializeAsString(jwtTokenService.generateIdToken(user, client.getId(), user.getDefaultAccountId()));
+        final var jwt = JWTSerializer.encodeAndSerializeAsString(jwtTokenService.generateIdToken(user, client.getId()));
         return new TokenResponseDto(jwt);
     }
 
     @PostMapping("/login/remember")
     public TokenResponseDto rememberMe(HttpServletRequest request, HttpServletResponse response, @RequestBody(required = false) @Valid RememberMeDto rememberMeDto) {
         final User user = rememberMeService.checkRememberMe(request, response, rememberMeDto).orElseThrow(() -> new NoSuchElementException("not.found"));
-        final JWTIDToken token = jwtTokenService.generateIdToken(user, "*", user.getDefaultAccountId());
+        final JWTIDToken token = jwtTokenService.generateIdToken(user, "*");
         token.setRememberMe(true);
         final String jwt = JWTSerializer.encodeAndSerializeAsString(token);
         return new TokenResponseDto(jwt);

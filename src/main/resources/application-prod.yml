@@ -7,7 +7,7 @@ security:
   oauth:
     tokens:
       issuer: id-server
-      audience: *
+      audience: '*'
       expiration:
         user:
           access: 30

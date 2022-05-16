@@ -12,11 +12,11 @@ import javax.persistence.*;
 @Table(name = "clients")
 @Getter
 @Setter
-public class Client implements AccessTokenOwner
-{
+public class Client implements AccessTokenOwner {
     private String id;
     private Long version = 0L;
     private String secret;
+    private Boolean isSecretEncrypted;
     private ServiceAccessToken accessToken;
 
     @Id

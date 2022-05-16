@@ -26,6 +26,7 @@ public class UserKeys implements KeyPairHolder, Serializable {
     private String publicKey;
     private String privateKey;
     private String keyId;
+    private Boolean isEncrypted = false;
     private KeyType keyType;
     private User user;
 
@@ -85,5 +86,15 @@ public class UserKeys implements KeyPairHolder, Serializable {
     @Enumerated(EnumType.STRING)
     public KeyType getKeyType() {
         return keyType;
+    }
+
+    @Override
+    public void encryptPrivateKey(String secret) {
+
+    }
+
+    @Override
+    public String decryptPrivateKey(String secret) {
+        return privateKey;
     }
 }

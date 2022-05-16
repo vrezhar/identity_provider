@@ -9,7 +9,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import javax.sql.DataSource;
 
 @TestConfiguration
-@ComponentScan("com.estateguru.authentication")
+@ComponentScan("am.ysu.identity")
 public class AuthenticationServerTestsConfiguration
 {
     @Bean

@@ -42,13 +42,13 @@ public class JWTTokenService extends TokenService {
         super(accessTokenDao, serviceAccessTokenDao, refreshTokenDao, environment);
         this.keyService = keyService;
         this.idTokenExpirationMinutes = environment.getProperty("security.oauth.tokens.expiration.user.id", Integer.class,2);
-        this.issuer = environment.getProperty("security.oauth.tokens.issuer", String.class,"id.staging.estateguru.co");
+        this.issuer = environment.getProperty("security.oauth.tokens.issuer");
         this.audiences = Arrays.asList(environment.getProperty("security.oauth.tokens.audience", String.class, "").replaceAll(" ", "").split(","));
     }
 
-    public JWTIDToken generateIdToken(User user, String requestingClient, String defaultAccountId) {
+    public JWTIDToken generateIdToken(User user, String requestingClient) {
         JWTIDToken jwtidToken = new JWTIDToken();
-        setIdTokenProperties(jwtidToken, user, requestingClient, defaultAccountId);
+        setIdTokenProperties(jwtidToken, user, requestingClient);
         setGenericTokenProperties(jwtidToken, idTokenExpirationMinutes);
         return jwtidToken;
     }
@@ -113,11 +113,10 @@ public class JWTTokenService extends TokenService {
         jwt.setRememberMe(Objects.requireNonNullElse(accessToken.getIsRememberMe(), false));
     }
 
-    private void setIdTokenProperties(JWTIDToken jwtidToken, User user, String requestingClient, String defaultAccountId) {
+    private void setIdTokenProperties(JWTIDToken jwtidToken, User user, String requestingClient) {
         jwtidToken.setUserId(user.getUniqueId().toString());
         jwtidToken.setUsername(user.getUsername());
         jwtidToken.setTokenId(UUID.randomUUID().toString());
-        jwtidToken.setAudience(issuer);
         if(requestingClient != null && !requestingClient.trim().equals("")){
             jwtidToken.addToAudience(requestingClient);
         }

@@ -20,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,6 +42,7 @@ public class TokenController {
     public @ResponseBody
     TokenResponseDto getAccessToken(
             @RequestBody AccessTokenRetrievalDto accessTokenRetrievalDto,
+            @AuthenticationPrincipal User user,
             @RequestParam("client_id") String clientId
     ) {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -48,7 +50,6 @@ public class TokenController {
         if(authentication instanceof UserAuthentication userAuthentication) {
             rememberMe = Objects.requireNonNullElse((Boolean)userAuthentication.jwt.getClaim(CustomJWTClaims.IS_REMEMBER_ME), false);
         }
-        final User user = (User) authentication.getPrincipal();
         user.setAccountId(accessTokenRetrievalDto.accountId);
         return new TokenResponseDto(
                 JWTSerializer.encodeAndSerializeAsString(
@@ -69,8 +70,7 @@ public class TokenController {
 
     @RequestMapping(value = "/service", method = RequestMethod.POST)
     @PreAuthorize("principal instanceof T(am.ysu.identity.domain.Client)")
-    public ResponseEntity<String> getServiceAccessToken() {
-        final Client client = (Client)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public ResponseEntity<String> getServiceAccessToken(@AuthenticationPrincipal Client client) {
         return ResponseHelper.createTokenResponse(JWTSerializer.encodeAndSerializeAsString(jwtTokenService.generateServiceAccessToken(client)));
     }
 

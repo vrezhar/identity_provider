@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +38,7 @@ public class UserController {
     }
 
     @PostMapping
+    @PreAuthorize("isAuthenticated()")
     public @ResponseBody OkStatus addNewUser(@RequestBody UserCredentialsDto userCredentialsDto) {
         if(userService.findByUsername(userCredentialsDto.getUsername()).isPresent()){
             throw new BadRequestException("user.exists");
@@ -46,6 +48,7 @@ public class UserController {
     }
 
     @PutMapping
+    @PreAuthorize("isAuthenticated()")
     public @ResponseBody OkStatus changePassword(@RequestBody UserCredentialsUpdateDto userCredentialsUpdateDto) { //,
 //                                                 @RequestParam(value = "redirect_uri", required = false) String redirectUrl,
 //                                                 @RequestParam(value = "nonce", required = false) String nonce,
@@ -76,6 +79,7 @@ public class UserController {
     }
 
     @DeleteMapping
+    @PreAuthorize("isAuthenticated()")
     @ResponseBody OkStatus deleteUser(@RequestParam("username") String username) {
         User user = userService.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
         jwtTokenService.deleteAccessTokensOf(user);
@@ -92,6 +96,7 @@ public class UserController {
     }
 
     @PutMapping("/initials")
+    @PreAuthorize("isAuthenticated()")
     public @ResponseBody OkStatus changeInitials(@RequestBody UserInitialsDto initialsDto) {
         final User user = userService.findByUsername(initialsDto.username).orElseThrow(() -> new UserNotFoundException(initialsDto.username));
         userService.changeInitials(user, initialsDto);
@@ -99,6 +104,7 @@ public class UserController {
     }
 
     @PostMapping(value = "/password/forgot")
+    @PreAuthorize("isAuthenticated()")
     public @ResponseBody KeyDto forgotPassword(@RequestBody @Valid UsernameDto usernameDto) {
         final String username = usernameDto.username();
         logger.info("Received password recovery request for username {}", username);
@@ -108,12 +114,14 @@ public class UserController {
     }
 
     @RequestMapping(value = "/password/recovery/check")
+    @PreAuthorize("isAuthenticated()")
     ResponseEntity<String> checkRecoveryKey(@RequestParam("password_recovery_key") String passwordRecoveryKey) throws JsonProcessingException {
         userService.findByPasswordRecoveryKeyIfNotExpired(passwordRecoveryKey).orElseThrow(() -> new UserNotFoundException(passwordRecoveryKey));
         return ResponseHelper.okResponse();
     }
 
     @RequestMapping(value = "/password/recover", method = RequestMethod.POST)
+    @PreAuthorize("isAuthenticated()")
     ResponseEntity<String> recoverPassword(@RequestParam("password_recovery_key") String passwordRecoveryKey, @RequestBody UserCredentialsDto userChangeDto) throws JsonProcessingException {
         User user = userService.findByPasswordRecoveryKeyIfNotExpired(passwordRecoveryKey).orElseThrow(() -> new UserNotFoundException(passwordRecoveryKey));
         if(!user.getUsername().equals(userChangeDto.getUsername())){
