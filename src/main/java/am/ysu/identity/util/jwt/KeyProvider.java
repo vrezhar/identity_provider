@@ -12,7 +12,7 @@ public interface KeyProvider {
 
     PrivateKey getPrivateKey(String keyId);
 
-    KeyPair getKeyPair(String keyId);
+    KeyPair getAsKeyPair(String keyId);
 
     KeyPair getKeyPair(User user);
 

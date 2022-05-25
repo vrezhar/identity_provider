@@ -44,50 +44,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorEntity'
 
-  /sign:
-    post:
-      summary: Sign data with server's public key
-      description: Sign given JSON(no restrictions) with server's private key
-      tags:
-        - Token endpoints
-      security:
-        - serviceAccessToken: []
-      requestBody:
-        content:
-          application/json:
-            example: {test: "test"}
-            schema:
-              type: object
-        required: true
-      parameters:
-        - required: false
-          schema:
-            description: Whether to format the response into a JWT or not
-            title: Produce JWT
-            type: boolean
-          name: produce_jwt
-          in: query
-        - required: false
-          schema:
-            description: The audience of the token, should be present if produce_jwt=true
-            title: Audience
-            type: string
-          name: audience
-          in: query
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SignatureResponse'
-        '403':
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorEntity'
-
   /token/service:
     post:
       security:
@@ -261,7 +217,7 @@ paths:
       tags:
         - Token endpoints
       summary: Endpoint for rrevoking an access token
-      description: Revvoke an access token by it's id
+      description: Revoke an access token by it's id
       operationId: revokeAccessToken
       parameters:
         - required: true

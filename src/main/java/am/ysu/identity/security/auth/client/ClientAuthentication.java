@@ -1,6 +1,6 @@
 package am.ysu.identity.security.auth.client;
 
-import am.ysu.identity.domain.Client;
+import am.ysu.identity.domain.client.Client;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 

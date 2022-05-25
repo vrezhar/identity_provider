@@ -1,6 +1,6 @@
 package am.ysu.identity.dao.tokens;
 
-import am.ysu.identity.domain.Client;
+import am.ysu.identity.domain.client.Client;
 import am.ysu.identity.domain.tokens.ServiceAccessToken;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

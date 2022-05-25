@@ -1,14 +1,13 @@
 package am.ysu.identity.service;
 
 import am.ysu.identity.dao.ClientDao;
-import am.ysu.identity.domain.Client;
+import am.ysu.identity.domain.client.Client;
 import am.ysu.identity.dto.request.ClientCredentialsDto;
 import am.ysu.identity.util.errors.common.auth.ClientAuthorizationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationConverter;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;

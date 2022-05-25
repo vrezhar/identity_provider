@@ -1,7 +1,7 @@
 package am.ysu.identity.controllers.tokens;
 
 import am.ysu.identity.controllers.util.ResponseHelper;
-import am.ysu.identity.domain.Client;
+import am.ysu.identity.domain.client.Client;
 import am.ysu.identity.domain.tokens.AccessToken;
 import am.ysu.identity.domain.user.User;
 import am.ysu.identity.dto.request.AccessTokenRetrievalDto;
@@ -14,7 +14,6 @@ import am.ysu.identity.util.errors.TokenValidationException;
 import am.ysu.identity.util.jwt.generation.JWTSerializer;
 import am.ysu.identity.dto.response.OkStatus;
 import am.ysu.identity.service.jwt.JWTTokenService;
-import am.ysu.identity.sync.Synchronization;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +36,7 @@ public class TokenController {
         this.jwtTokenService = jwtTokenService;
     }
 
-    @RequestMapping(value = "/user", method = RequestMethod.POST)
+    @PostMapping("/user")
     @PreAuthorize("principal instanceof T(am.ysu.identity.domain.user.User)")
     public @ResponseBody
     TokenResponseDto getAccessToken(
@@ -50,7 +49,6 @@ public class TokenController {
         if(authentication instanceof UserAuthentication userAuthentication) {
             rememberMe = Objects.requireNonNullElse((Boolean)userAuthentication.jwt.getClaim(CustomJWTClaims.IS_REMEMBER_ME), false);
         }
-        user.setAccountId(accessTokenRetrievalDto.accountId);
         return new TokenResponseDto(
                 JWTSerializer.encodeAndSerializeAsString(
                         jwtTokenService.generateUserAccessToken(user, clientId, rememberMe)
@@ -59,7 +57,7 @@ public class TokenController {
         );
     }
 
-    @RequestMapping(value = "/check", method = RequestMethod.POST)
+    @PostMapping(value = "/check")
     public ResponseEntity<?> checkToken() {
         final var authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication instanceof JWTAuthentication jwtAuthentication) {
@@ -68,8 +66,8 @@ public class TokenController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/service", method = RequestMethod.POST)
-    @PreAuthorize("principal instanceof T(am.ysu.identity.domain.Client)")
+    @PostMapping(value = "/service")
+    @PreAuthorize("principal instanceof T(am.ysu.identity.domain.client.Client)")
     public ResponseEntity<String> getServiceAccessToken(@AuthenticationPrincipal Client client) {
         return ResponseHelper.createTokenResponse(JWTSerializer.encodeAndSerializeAsString(jwtTokenService.generateServiceAccessToken(client)));
     }

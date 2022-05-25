@@ -1,9 +1,7 @@
 package am.ysu.identity.security.filters.basic;
 
-import am.ysu.identity.dto.request.ClientCredentialsDto;
 import am.ysu.identity.security.filters.CredentialAwareFilter;
-import am.ysu.identity.util.errors.common.auth.ClientAuthorizationException;
-import am.ysu.identity.domain.Client;
+import am.ysu.identity.domain.client.Client;
 import am.ysu.identity.security.auth.client.ClientAuthentication;
 import am.ysu.identity.service.ClientService;
 import org.springframework.core.annotation.Order;

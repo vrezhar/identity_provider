@@ -1,7 +1,7 @@
 package am.ysu.identity.util.jwt.provider;
 
-import am.ysu.identity.dao.user.UserKeysDao;
-import am.ysu.identity.util.jwt.BaseKeyProvider;
+import am.ysu.identity.domain.user.User;
+import am.ysu.identity.util.jwt.KeyProvider;
 import am.ysu.security.security.util.key.KeyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,13 +20,12 @@ import java.util.List;
 @Order(Ordered.HIGHEST_PRECEDENCE + 1)
 @Component("keyProvider")
 @ConditionalOnProperty(value = "security.key.provider.class", havingValue = "FileBasedKeyProvider")
-public class FileBasedKeyProvider extends BaseKeyProvider {
+public class FileBasedKeyProvider implements KeyProvider {
     private static final Logger logger = LoggerFactory.getLogger(FileBasedKeyProvider.class);
 
     private final KeyPair serverKeys;
 
-    public FileBasedKeyProvider(KeyPair serverKeys, UserKeysDao userKeysDao) {
-        super(userKeysDao);
+    public FileBasedKeyProvider(KeyPair serverKeys) {
         this.serverKeys = serverKeys;
     }
 
@@ -34,10 +33,6 @@ public class FileBasedKeyProvider extends BaseKeyProvider {
     public PublicKey getPublicKey(String keyId) {
         if(keyId == null) {
             return null;
-        }
-        final var key = super.getPublicKey(keyId);
-        if(key != null) {
-            return key;
         }
         final PublicKey publicKey = serverKeys.getPublic();
         if(KeyUtils.calculateFingerPrintHex(publicKey).equals(keyId)) {
@@ -51,10 +46,6 @@ public class FileBasedKeyProvider extends BaseKeyProvider {
         if(keyId == null) {
             return null;
         }
-        final var key = super.getPrivateKey(keyId);
-        if(key != null) {
-            return key;
-        }
         if(KeyUtils.calculateFingerPrintHex(serverKeys.getPublic()).equals(keyId)) {
             logger.warn("Unknown key id {}, will be returning the server key", keyId);
         }
@@ -62,13 +53,9 @@ public class FileBasedKeyProvider extends BaseKeyProvider {
     }
 
     @Override
-    public KeyPair getKeyPair(String keyId) {
+    public KeyPair getAsKeyPair(String keyId) {
         if(keyId == null) {
             return null;
-        }
-        final var keys = super.getKeyPair(keyId);
-        if(keys != null) {
-            return keys;
         }
         if(KeyUtils.calculateFingerPrintHex(serverKeys.getPublic()).equals(keyId)) {
             logger.warn("Unknown key id {}, will be returning the server key", keyId);
@@ -77,17 +64,30 @@ public class FileBasedKeyProvider extends BaseKeyProvider {
     }
 
     @Override
+    public KeyPair getKeyPair(User user) {
+        return serverKeys;
+    }
+
+    @Override
+    public KeyPair generateKeyPair(User user) {
+        return null;
+    }
+
+    @Override
     public List<String> availableKeys() {
-        final List<String> userKeys = super.availableKeys();
-        final List<String> allKeys = new ArrayList<>(userKeys.size() + 1);
+        final List<String> allKeys = new ArrayList<>(1);
         allKeys.add(KeyUtils.calculateFingerPrintHex(serverKeys.getPublic()));
-        allKeys.addAll(userKeys);
         return allKeys;
     }
 
     @Override
     public List<String> availableServerKeys() {
         return Collections.singletonList(KeyUtils.calculateFingerPrintHex(serverKeys.getPublic()));
+    }
+
+    @Override
+    public List<String> availableUserKeys() {
+        return availableServerKeys();
     }
 
 //    @PostConstruct

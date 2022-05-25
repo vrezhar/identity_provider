@@ -69,11 +69,11 @@ public class DatabaseKeyProvider extends BaseKeyProvider implements Initializing
     }
 
     @Override
-    public KeyPair getKeyPair(String keyId) {
+    public KeyPair getAsKeyPair(String keyId) {
         if(keyId == null) {
             return null;
         }
-        var pair = super.getKeyPair(keyId);
+        var pair = super.getAsKeyPair(keyId);
         if(pair != null) {
             return pair;
         }

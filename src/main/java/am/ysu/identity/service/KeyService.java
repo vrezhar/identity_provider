@@ -53,7 +53,7 @@ public class KeyService implements InitializingBean { //implements KeyProvider {
     }
 
     public KeyPair getKeys(String keyId) {
-        return keyProvider.getKeyPair(keyId);
+        return keyProvider.getAsKeyPair(keyId);
     }
 
     public PublicKey getPublicKey(String keyId) {

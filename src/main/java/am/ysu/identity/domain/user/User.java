@@ -8,13 +8,13 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.*;
 
 @Entity
 @Getter
 @Setter
-public class User implements AccessTokenOwner
-{
+public class User implements AccessTokenOwner, Serializable {
     private Long id;
     private Long version = 0L;
     private UUID uniqueId;
@@ -25,13 +25,25 @@ public class User implements AccessTokenOwner
     private String lastName;
     private String defaultAccountId;
     private UserKeys keys;
-    private String accountId;
     private String passwordRecoveryKey;
     private Set<AccessToken> tokens = new HashSet<>();
     private Set<OldCredentials> oldCredentials = new HashSet<>();
 
     private Date dateCreated;
     private Date lastUpdated;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User that = (User) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,11 +65,6 @@ public class User implements AccessTokenOwner
     @Column(unique = true)
     public String getUsername() {
         return username;
-    }
-
-    @Transient
-    public String getAccountId() {
-        return accountId;
     }
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE)

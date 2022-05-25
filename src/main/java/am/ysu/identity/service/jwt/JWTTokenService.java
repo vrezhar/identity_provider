@@ -3,7 +3,7 @@ package am.ysu.identity.service.jwt;
 import am.ysu.identity.dao.tokens.RefreshTokenDao;
 import am.ysu.identity.dao.tokens.ServiceAccessTokenDao;
 import am.ysu.identity.dao.tokens.AccessTokenDao;
-import am.ysu.identity.domain.Client;
+import am.ysu.identity.domain.client.Client;
 import am.ysu.identity.domain.tokens.RefreshToken;
 import am.ysu.identity.domain.tokens.AccessToken;
 import am.ysu.identity.domain.user.User;

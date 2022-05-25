@@ -6,7 +6,7 @@ import am.ysu.identity.token.jwt.structure.CustomJWTClaims;
 import am.ysu.identity.util.errors.UserNotFoundException;
 import am.ysu.identity.dao.tokens.AccessTokenDao;
 import am.ysu.identity.dao.user.UserDao;
-import am.ysu.identity.domain.Client;
+import am.ysu.identity.domain.client.Client;
 import am.ysu.identity.domain.user.User;
 import am.ysu.identity.service.ClientService;
 import am.ysu.identity.service.KeyService;

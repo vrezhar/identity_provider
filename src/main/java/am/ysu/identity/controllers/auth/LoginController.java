@@ -4,7 +4,7 @@ import am.ysu.identity.dto.request.user.RememberMeDto;
 import am.ysu.identity.dto.request.user.UserCredentialsDto;
 import am.ysu.identity.dto.request.user.UserInitialsDto;
 import am.ysu.identity.dto.response.auth.TokenResponseDto;
-import am.ysu.identity.domain.Client;
+import am.ysu.identity.domain.client.Client;
 import am.ysu.identity.domain.user.User;
 import am.ysu.identity.service.user.RememberMeService;
 import am.ysu.identity.service.user.UserService;
@@ -17,17 +17,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
 import java.util.NoSuchElementException;
 
 @RestController
@@ -58,7 +55,7 @@ public class LoginController {
     }
 
     @PostMapping("/login/vouch")
-    @PreAuthorize("principal instanceof T(am.ysu.identity.domain.Client)")
+    @PreAuthorize("principal instanceof T(am.ysu.identity.domain.client.Client)")
     public TokenResponseDto vouch(
             @AuthenticationPrincipal Client client,
             @Valid @RequestBody UserInitialsDto userInitialsDto

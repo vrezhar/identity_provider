@@ -64,6 +64,21 @@
       "name": "openid.access.token.expiration",
       "type": "java.lang.String",
       "description": "Access token expiration in minutes."
+    },
+    {
+      "name": "security.preferEllipticKeys",
+      "type": "java.lang.Boolean",
+      "description": "Whether to prefer elliptic keys during generation."
+    },
+    {
+      "name": "security.useSeparateUserKeys",
+      "type": "java.lang.Boolean",
+      "description": "Whether to use separate keys for each user."
+    },
+    {
+      "name": "security.encryptPrivateKeys",
+      "type": "java.lang.Boolean",
+      "description": "Whether to encrypt generated private keys."
     }
   ]
 }

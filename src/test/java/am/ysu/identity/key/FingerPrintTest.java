@@ -1,5 +1,6 @@
 package am.ysu.identity.key;
 
+import am.ysu.identity.domain.security.keys.ServerKeyMetadata;
 import am.ysu.identity.jwt.TestingKeyHolder;
 import am.ysu.identity.util.RSAKeyUtils;
 import org.junit.jupiter.api.Assertions;
@@ -47,6 +48,20 @@ public class FingerPrintTest
             assertEquals(fingerprintHex, DatatypeConverter.printHexBinary(fingerprint).toLowerCase());
         }
         catch (Exception e){
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void test() {
+        try {
+            final var ec = ServerKeyMetadata.KeyAlgorithm.EC.generateKeyPair();
+            assertNotNull(ec);
+            final var rsa = ServerKeyMetadata.KeyAlgorithm.RSA.generateKeyPair();
+            assertNotNull(rsa);
+            final var ed = ServerKeyMetadata.KeyAlgorithm.ED_EC.generateKeyPair();
+            assertNotNull(ed);
+        } catch(Exception e) {
             fail(e.getMessage());
         }
     }

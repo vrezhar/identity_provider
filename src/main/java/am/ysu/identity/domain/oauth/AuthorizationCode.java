@@ -1,6 +1,6 @@
 package am.ysu.identity.domain.oauth;
 
-import am.ysu.identity.domain.Client;
+import am.ysu.identity.domain.client.Client;
 import am.ysu.identity.domain.tokens.AccessToken;
 import am.ysu.identity.domain.user.User;
 import lombok.Getter;

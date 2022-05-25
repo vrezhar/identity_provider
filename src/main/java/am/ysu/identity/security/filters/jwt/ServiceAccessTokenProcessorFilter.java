@@ -4,7 +4,7 @@ import am.ysu.identity.security.filters.AbstractJWTFilter;
 import am.ysu.identity.service.jwt.TokenValidatorService;
 import am.ysu.identity.util.errors.common.auth.ClientAuthorizationException;
 import am.ysu.security.jwt.JWT;
-import am.ysu.identity.domain.Client;
+import am.ysu.identity.domain.client.Client;
 import am.ysu.identity.security.auth.client.ClientAuthentication;
 import am.ysu.identity.service.jwt.JWTTokenService;
 import am.ysu.identity.util.Realms;

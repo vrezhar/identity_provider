@@ -44,7 +44,7 @@ public class InMemoryKeyProvider implements KeyProvider, InitializingBean {
     }
 
     @Override
-    public KeyPair getKeyPair(String keyId) {
+    public KeyPair getAsKeyPair(String keyId) {
         if(keyId == null) {
             return null;
         }

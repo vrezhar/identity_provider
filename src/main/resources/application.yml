@@ -15,6 +15,9 @@ spring:
         physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
 
 security:
+  preferEllipticKeys: false
+  useSeparateUserKeys: false
+  encryptPrivateKeys: false
   remember-me:
     cookie:
       domain: localhost

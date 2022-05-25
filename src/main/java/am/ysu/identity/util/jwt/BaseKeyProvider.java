@@ -52,7 +52,7 @@ public abstract class BaseKeyProvider implements KeyProvider {
     }
 
     @Override
-    public KeyPair getKeyPair(String keyId) {
+    public KeyPair getAsKeyPair(String keyId) {
         var keys = userKeysDao.findByKeyId(keyId).orElse(null);
         if(keys == null) {
             return null;

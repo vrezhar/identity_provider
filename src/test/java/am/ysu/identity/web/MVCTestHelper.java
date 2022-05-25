@@ -2,7 +2,7 @@ package am.ysu.identity.web;
 
 import am.ysu.identity.domain.tokens.ServiceAccessToken;
 import am.ysu.identity.domain.tokens.AccessToken;
-import am.ysu.identity.domain.Client;
+import am.ysu.identity.domain.client.Client;
 import am.ysu.identity.service.ClientService;
 import am.ysu.identity.service.user.UserService;
 import am.ysu.identity.service.jwt.JWTTokenService;

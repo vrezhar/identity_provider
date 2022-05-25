@@ -1,6 +1,6 @@
 package am.ysu.identity.domain.tokens;
 
-import am.ysu.identity.domain.Client;
+import am.ysu.identity.domain.client.Client;
 import am.ysu.identity.token.AccessTokenType;
 import am.ysu.identity.token.AbstractAccessToken;
 import lombok.Getter;

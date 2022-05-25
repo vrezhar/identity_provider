@@ -1,7 +1,7 @@
 package am.ysu.identity.service;
 
 import am.ysu.identity.dao.tokens.ServiceAccessTokenDao;
-import am.ysu.identity.domain.Client;
+import am.ysu.identity.domain.client.Client;
 import am.ysu.identity.domain.tokens.ServiceAccessToken;
 import am.ysu.identity.domain.tokens.AccessToken;
 import am.ysu.identity.domain.user.User;
@@ -157,7 +157,6 @@ public class TokenService {
         ServiceAccessToken accessToken = new ServiceAccessToken();
         accessToken.setIssuedAt(new Date());
         accessToken.setExpiresIn(getServiceAccessTokenExpirationDateFromNow());
-        client.setAccessToken(null);
         accessToken.setClient(client);
         return serviceAccessTokenDao.save(accessToken);
     }
